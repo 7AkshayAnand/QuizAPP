@@ -61,4 +61,8 @@ public class QuestionService {
             throw new RuntimeException("Question not found with id: " + updatedQuestion.getId());
         }
     }
+
+    public Optional<Question> getQuestionById(Integer id) {
+        return questionDao.findById(id);
+    }
 }

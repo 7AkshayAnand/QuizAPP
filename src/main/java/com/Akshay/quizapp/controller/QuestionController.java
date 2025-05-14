@@ -26,6 +26,11 @@ public class QuestionController {
 
     }
 
+    @PostMapping("search/{id}")
+    public Optional<Question> searchById(@PathVariable Integer id){
+        return questionService.getQuestionById(id);
+    }
+
     @PostMapping("update")
     public String updateQuestion(@RequestBody Question question){
         return questionService.updateQuestion(question);
