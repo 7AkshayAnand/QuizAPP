@@ -26,7 +26,7 @@ public class QuestionController {
 
     }
 
-    @PostMapping("search/{id}")
+    @GetMapping("search/{id}")
     public Optional<Question> searchById(@PathVariable Integer id){
         return questionService.getQuestionById(id);
     }
