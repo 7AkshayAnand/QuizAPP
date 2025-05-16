@@ -3,9 +3,12 @@ package com.Akshay.quizapp.service;
 import com.Akshay.quizapp.Question;
 import com.Akshay.quizapp.dao.QuestionDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,33 +16,50 @@ import java.util.Optional;
 public class QuestionService {
     @Autowired
     QuestionDao questionDao;
-    public List<Question> getAllQuestions() {
-        List<Question> list=questionDao.findAll();
-        System.out.println("value from list is  "+list.get(0)+" full list is "+list);
-        for(Question q :list){
-            System.out.println(q);
-        }
-        return  list;
+    public ResponseEntity<List<Question>> getAllQuestions() {
+       try{
+           return  new ResponseEntity<>(questionDao.findAll(), HttpStatus.OK);
+       }catch(Exception e){
+           e.printStackTrace();
+       }
+
+        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.BAD_REQUEST);
+
     }
 
-    public List<Question> getQuestionsByCategory(String category) {
-
-       return questionDao.findByCategory(category);
+    public  ResponseEntity<List<Question>> getQuestionsByCategory(String category) {
+      try{
+          return new ResponseEntity<>(questionDao.findByCategory(category),HttpStatus.OK);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.BAD_REQUEST);
     }
 
-    public String addQuestion(Question question) {
-        questionDao.save(question);
-        return "Successfully created";
+    public ResponseEntity<String> addQuestion(Question question) {
+       try{
+           questionDao.save(question);
+           return new ResponseEntity<>("Successfully created",HttpStatus.CREATED);
+       }catch(Exception e){
+           e.printStackTrace();
+       }
+        return new ResponseEntity<>("NOT Created",HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public String removeById(Integer id) {
+    public ResponseEntity<String> removeById(Integer id) {
         System.out.println("deletion starts ");
-        questionDao.deleteById(id);
-        return "successfully deleted";
+        try{
+            questionDao.deleteById(id);
+            return new ResponseEntity<>("successfully deleted",HttpStatus.OK);
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+       return new ResponseEntity<>("Cannot Delete",HttpStatus.BAD_REQUEST);
     }
 
 
-    public String updateQuestion(Question updatedQuestion) {
+    public ResponseEntity<String> updateQuestion(Question updatedQuestion) {
         Optional<Question> existingQuestionOpt = questionDao.findById(updatedQuestion.getId());
 
         if (existingQuestionOpt.isPresent()) {
@@ -56,13 +76,18 @@ public class QuestionService {
             existingQuestion.setCategory(updatedQuestion.getCategory());
 
              questionDao.save(existingQuestion);
-             return "updaed successfully";
+             return new ResponseEntity<>("updaed successfully",HttpStatus.CREATED);
         } else {
             throw new RuntimeException("Question not found with id: " + updatedQuestion.getId());
         }
     }
 
-    public Optional<Question> getQuestionById(Integer id) {
-        return questionDao.findById(id);
+    public ResponseEntity<Optional<Question>> getQuestionById(Integer id) {
+        try{
+            return new ResponseEntity<>(questionDao.findById(id),HttpStatus.FOUND);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(Optional.empty(),HttpStatus.NOT_FOUND);
     }
 }
